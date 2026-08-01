@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base target="_top" />
+    <style>
+      :root {
+        --bg: #f5f6f8;
+        --panel: #fff;
+        --border: #e2e5ea;
+        --text: #1f2430;
+        --muted: #6b7280;
+        --accent: #4f46e5;
+        --accent-soft: #eef2ff;
+        --danger-soft: #fee2e2;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      button, input { font: inherit; }
+      header {
+        padding: 20px 28px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+      }
+      header h1 { margin: 0 0 4px; font-size: 20px; }
+      header p { margin: 0; color: var(--muted); font-size: 13px; }
+      .layout { display: flex; align-items: flex-start; gap: 20px; padding: 20px 28px; }
+      .sidebar {
+        flex: 0 0 280px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+      }
+      .sidebar h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--muted);
+        margin: 0 0 10px;
+      }
+      .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+      .btn {
+        flex: 1;
+        padding: 6px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 6px;
+        color: var(--text);
+      }
+      .btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+      .edu-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 4px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .edu-item:hover { background: var(--accent-soft); }
+      .edu-item input { accent-color: var(--accent); cursor: pointer; }
+      .swatch { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 10px; }
+      .edu-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .copy-btn, .show-btn {
+        flex: 0 0 auto;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 5px;
+        font-size: 11px;
+        padding: 2px 7px;
+        cursor: pointer;
+        color: var(--muted);
+      }
+      .copy-btn:hover, .show-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+      .copy-btn.copied { background: #16a34a; border-color: #16a34a; color: #fff; }
+      .copy-btn:disabled { opacity: .4; cursor: not-allowed; }
+      .hide-btn {
+        flex: 0 0 auto;
+        border: 0;
+        background: transparent;
+        color: #a8adb7;
+        font-size: 13px;
+        line-height: 1;
+        padding: 4px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      .hide-btn:hover { background: var(--danger-soft); color: #dc2626; }
+      #hidden-wrap { margin-top: 14px; }
+      .hidden-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--muted);
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+        margin-bottom: 6px;
+      }
+      .hidden-head .btn { flex: 0 0 auto; }
+      .hidden-item { color: var(--muted); cursor: default; }
+      .main { flex: 1; min-width: 0; }
+      .cal { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; overflow: auto; }
+      table { width: 100%; min-width: 650px; border-collapse: collapse; }
+      th, td { border: 1px solid var(--border); vertical-align: top; }
+      thead th { background: #fafbfc; padding: 12px 10px; font-size: 14px; text-align: center; }
+      thead th small { display: block; color: var(--muted); font-weight: 400; font-size: 11px; }
+      .time-col {
+        width: 92px;
+        background: #fafbfc;
+        font-size: 12px;
+        color: var(--muted);
+        text-align: right;
+        padding: 10px;
+        white-space: nowrap;
+        font-weight: 600;
+      }
+      td.slot { padding: 6px; height: 70px; }
+      .count { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+      .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+      .chip { font-size: 11px; padding: 2px 7px; border-radius: 999px; color: #fff; white-space: nowrap; }
+      .empty { color: #c3c7cf; font-size: 12px; font-style: italic; }
+      .message { color: var(--muted); font-size: 13px; padding: 40px; text-align: center; }
+      .message.error { color: #b91c1c; }
+      footer { padding: 8px 28px 28px; color: var(--muted); font-size: 12px; }
+
+      @media (max-width: 760px) {
+        header { padding: 18px; }
+        .layout { display: block; padding: 14px; }
+        .sidebar { position: static; max-height: none; margin-bottom: 14px; }
+        footer { padding: 6px 18px 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Educator Availability - EdTech-a-thon</h1>
+      <p>All times Eastern. Select one or more educators to see their combined availability.</p>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>Educators <span id="shown-count"></span></h2>
+        <div class="btn-row">
+          <button class="btn" id="select-all" type="button">Select all</button>
+          <button class="btn" id="clear-all" type="button">Clear</button>
+        </div>
+        <div id="edu-list"></div>
+        <div id="hidden-wrap"></div>
+      </aside>
+
+      <main class="main">
+        <div class="cal">
+          <div class="message" id="message">Loading current availability...</div>
+          <table id="calendar" hidden>
+            <thead><tr id="head-row"></tr></thead>
+            <tbody id="calendar-body"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <footer id="footer">Availability is loaded live from the event response spreadsheet.</footer>
+
+    <script>
+      const DAYS = [
+        { key: "M", label: "Monday", date: "Day 1" },
+        { key: "T", label: "Tuesday", date: "Day 2" },
+        { key: "W", label: "Wednesday", date: "Day 3" },
+      ];
+      const PALETTE = [
+        "#4f46e5", "#0891b2", "#db2777", "#ea580c", "#16a34a", "#9333ea",
+        "#0d9488", "#dc2626", "#2563eb", "#ca8a04", "#7c3aed", "#059669",
+        "#e11d48", "#d97706", "#0284c7", "#65a30d", "#be123c", "#6d28d9",
+        "#0369a1", "#c2410c", "#15803d", "#a16207",
+      ];
+      const STORAGE_KEY = "educatorAvailabilityHidden.v1";
+
+      let educators = [];
+      let slots = [];
+      const selected = new Set();
+      let hidden = new Set();
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (Array.isArray(saved)) hidden = new Set(saved.map(String));
+      } catch (_) {}
+
+      const eduList = document.querySelector("#edu-list");
+      const hiddenWrap = document.querySelector("#hidden-wrap");
+      const message = document.querySelector("#message");
+      const calendar = document.querySelector("#calendar");
+
+      document.querySelector("#head-row").innerHTML =
+        '<th class="time-col">Time (EST)</th>' +
+        DAYS.map((day) => `<th>${day.label}<small>${day.date}</small></th>`).join("");
+
+      document.querySelector("#select-all").addEventListener("click", () => {
+        educators.forEach((_, index) => {
+          if (!hidden.has(String(index))) selected.add(index);
+        });
+        buildSidebar();
+        renderCalendar();
+      });
+
+      document.querySelector("#clear-all").addEventListener("click", () => {
+        selected.clear();
+        buildSidebar();
+        renderCalendar();
+      });
+
+      google.script.run
+        .withSuccessHandler(loadEducators)
+        .withFailureHandler(showError)
+        .getEducators();
+
+      function loadEducators(data) {
+        educators = data.educators.map((educator, index) => ({
+          ...educator,
+          color: PALETTE[index % PALETTE.length],
+        }));
+        slots = data.slots;
+        hidden = new Set([...hidden].filter((index) => educators[Number(index)]));
+        saveHidden();
+        buildSidebar();
+        renderCalendar();
+
+        if (data.updatedAt) {
+          document.querySelector("#footer").textContent =
+            `Availability loaded from the event response spreadsheet at ${data.updatedAt}.`;
+        }
+      }
+
+      function showError(error) {
+        message.className = "message error";
+        message.textContent = `Availability could not be loaded. ${error.message || error}`;
+      }
+
+      function buildSidebar() {
+        document.querySelector("#shown-count").textContent =
+          `(${educators.length - hidden.size} shown)`;
+        eduList.replaceChildren();
+
+        educators.forEach((educator, index) => {
+          if (hidden.has(String(index))) return;
+
+          const label = document.createElement("label");
+          label.className = "edu-item";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = selected.has(index);
+          checkbox.addEventListener("change", () => {
+            checkbox.checked ? selected.add(index) : selected.delete(index);
+            renderCalendar();
+          });
+
+          label.append(checkbox, makeSwatch(educator.color), makeName(educator.name));
+
+          const copyButton = makeButton("copy-btn", "Copy");
+          copyButton.disabled = !educator.email;
+          copyButton.title = educator.email ? `Copy ${educator.email}` : "No email on file";
+          copyButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            copyEmail(educator.email, copyButton);
+          });
+
+          const hideButton = makeButton("hide-btn", "x");
+          hideButton.title = `Hide ${educator.name}`;
+          hideButton.setAttribute("aria-label", hideButton.title);
+          hideButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            hidden.add(String(index));
+            selected.delete(index);
+            saveHidden();
+            buildSidebar();
+            renderCalendar();
+          });
+
+          label.append(copyButton, hideButton);
+          eduList.append(label);
+        });
+
+        buildHiddenSection();
+      }
+
+      function buildHiddenSection() {
+        hiddenWrap.replaceChildren();
+        if (hidden.size === 0) return;
+
+        const head = document.createElement("div");
+        head.className = "hidden-head";
+        const title = document.createElement("span");
+        title.textContent = `Hidden (${hidden.size})`;
+        const restoreAll = makeButton("btn", "Show all");
+        restoreAll.addEventListener("click", () => {
+          hidden.clear();
+          saveHidden();
+          buildSidebar();
+        });
+        head.append(title, restoreAll);
+        hiddenWrap.append(head);
+
+        [...hidden].map(Number).sort((a, b) => a - b).forEach((index) => {
+          const educator = educators[index];
+          if (!educator) return;
+
+          const row = document.createElement("div");
+          row.className = "edu-item hidden-item";
+          const showButton = makeButton("show-btn", "Show");
+          showButton.addEventListener("click", () => {
+            hidden.delete(String(index));
+            saveHidden();
+            buildSidebar();
+          });
+          row.append(makeSwatch(educator.color), makeName(educator.name), showButton);
+          hiddenWrap.append(row);
+        });
+      }
+
+      function renderCalendar() {
+        if (selected.size === 0) {
+          calendar.hidden = true;
+          message.hidden = false;
+          message.className = "message";
+          message.textContent = educators.length
+            ? "Select at least one educator from the left to view schedules."
+            : "No educator responses were found.";
+          return;
+        }
+
+        message.hidden = true;
+        calendar.hidden = false;
+        const body = document.querySelector("#calendar-body");
+        body.replaceChildren();
+        const chosen = [...selected].map((index) => educators[index]).filter(Boolean);
+
+        slots.forEach((slot, slotIndex) => {
+          const row = document.createElement("tr");
+          const time = document.createElement("td");
+          time.className = "time-col";
+          time.textContent = slot;
+          row.append(time);
+
+          DAYS.forEach((day) => {
+            const cell = document.createElement("td");
+            cell.className = "slot";
+            const available = chosen.filter((educator) =>
+              educator.avail[slotIndex].includes(day.key),
+            );
+
+            if (available.length === 0) {
+              const empty = document.createElement("span");
+              empty.className = "empty";
+              empty.textContent = "-";
+              cell.append(empty);
+            } else {
+              const count = document.createElement("div");
+              count.className = "count";
+              count.textContent = `${available.length} available`;
+              const chips = document.createElement("div");
+              chips.className = "chips";
+              available.forEach((educator) => {
+                const chip = document.createElement("span");
+                chip.className = "chip";
+                chip.style.background = educator.color;
+                chip.textContent = educator.name.split(/\s+/)[0];
+                chip.title = educator.name;
+                chips.append(chip);
+              });
+              cell.append(count, chips);
+            }
+            row.append(cell);
+          });
+          body.append(row);
+        });
+      }
+
+      function makeSwatch(color) {
+        const swatch = document.createElement("span");
+        swatch.className = "swatch";
+        swatch.style.background = color;
+        return swatch;
+      }
+
+      function makeName(name) {
+        const element = document.createElement("span");
+        element.className = "edu-name";
+        element.textContent = name;
+        element.title = name;
+        return element;
+      }
+
+      function makeButton(className, text) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = className;
+        button.textContent = text;
+        return button;
+      }
+
+      function saveHidden() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([...hidden]));
+        } catch (_) {}
+      }
+
+      async function copyEmail(email, button) {
+        if (!email) return;
+        try {
+          await navigator.clipboard.writeText(email);
+        } catch (_) {
+          const input = document.createElement("textarea");
+          input.value = email;
+          input.style.position = "fixed";
+          input.style.opacity = "0";
+          document.body.append(input);
+          input.select();
+          document.execCommand("copy");
+          input.remove();
+        }
+
+        button.textContent = "Copied!";
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.textContent = "Copy";
+          button.classList.remove("copied");
+        }, 1200);
+      }
+    </script>
+  </body>
+</html>
